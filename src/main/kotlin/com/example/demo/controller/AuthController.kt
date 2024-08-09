@@ -20,6 +20,9 @@ class AuthController(val authService: AuthService) {
     @Value("\${endpoints.authorize}")
     private val authorizeUrl: String = ""
 
+    @Value("\${endpoints.authorizeSaml}")
+    private val authorizeUrlSaml:String = ""
+
     /**
      * Redirect user to correct url for authorization code
      */
@@ -30,10 +33,21 @@ class AuthController(val authService: AuthService) {
             .header(HttpHeaders.LOCATION, authorizeUrl)
             .build()
 
+    @GetMapping("/login_saml")
+    fun loginSaml(): ResponseEntity<Any> =
+        ResponseEntity
+            .status(HttpStatus.SEE_OTHER)
+            .header(HttpHeaders.LOCATION, authorizeUrlSaml)
+            .build()
+
     /**
      * Get aws tokens with authorization code
      */
     @GetMapping("/token")
     fun token(@RequestParam("code") code: String): CognitoJWT? =
+        authService.getToken(code)
+
+    @GetMapping("/token_saml")
+    fun tokenSaml(@RequestParam("code") code: String): CognitoJWT? =
         authService.getToken(code)
 }

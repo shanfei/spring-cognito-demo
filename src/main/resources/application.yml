@@ -1,12 +1,23 @@
 urls:
-  cognito:    # cognito root auth url
+  cognito:    https://fei.auth.us-west-1.amazoncognito.com
 
 endpoints:
   authorize: ${urls.cognito}/oauth2/authorize?response_type=code&client_id=${cognito.client}&redirect_uri=${cognito.callback}
+  authorizeSaml: ${urls.cognito}/oauth2/authorize?response_type=code&client_id=${cognitoSaml.client}&redirect_uri=${cognitoSaml.callback}
   token: ${urls.cognito}/oauth2/token
 
 cognito:
-  client:     # cognito client id
-  secret:     # cognito client secret
-  callback:   # valid callback url set in cognito
-  keys:       # url for cognito jwt keys
+  client:     2tkjbfe2m0dem9a9hau7bb12ms
+  secret:     cdr9e8i38hqil9q91p4dep78tn0d8t1gs8bi8qdvuq11ecdj994
+  callback:   http://localhost:8090/auth/token
+  keys:       https://cognito-idp.us-west-1.amazonaws.com/us-west-1_5ytyUPC12/.well-known/jwks.json
+
+cognitoSaml:
+  client: 5uccuupt8t8pn4vje6th28t692
+  secret: 1br8l088g93g0i80leg9oabihvdlkqa6pqbqpfljfro87f7b3noq
+  callback: http://localhost:8090/auth/token_saml
+  keys: https://cognito-idp.us-west-1.amazonaws.com/us-west-1_5ytyUPC12/.well-known/jwks.json
+
+
+server:
+  port: 8090

@@ -20,13 +20,13 @@ class AuthService {
     @Value("\${endpoints.token}")
     private val tokenUrl: String = ""
 
-    @Value("\${cognito.client}")
+    @Value("\${cognitoSaml.client}")
     private val clientId: String = ""
 
-    @Value("\${cognito.secret}")
+    @Value("\${cognitoSaml.secret}")
     private val clientSecret: String = ""
 
-    @Value("\${cognito.callback}")
+    @Value("\${cognitoSaml.callback}")
     private val callbackUrl: String = ""
 
     /**
@@ -42,7 +42,7 @@ class AuthService {
             issued = details.getClaim("iat") as Date,
             expire = details.getClaim("exp") as Date,
             name = details.getStringClaim("name"),
-            cognitoUserName = details.getStringClaim("cognito:username"),
+            cognitoUserName = details.getStringClaim("username"),
             email = details.getStringClaim("email")
         )
     }
@@ -64,6 +64,28 @@ class AuthService {
         val req = HttpEntity<Nothing?>(null, headers)
 
         val url = "$tokenUrl?grant_type=authorization_code&client_id=$clientId&code=$code&redirect_uri=$callbackUrl"
+
+        // exchange cognitoJWT with Raken JWT
+
+        return client.postForObject(url, req, CognitoJWT::class.java)
+    }
+
+    fun getTokenSaml(code: String): CognitoJWT? {
+        val client = RestTemplate()
+
+        val headers = LinkedMultiValueMap<String, String>()
+
+        val auth = "$clientId:$clientSecret".toBase64()
+
+        headers.add("HeaderName", "value")
+        headers.add("Authorization", "Basic $auth")
+        headers.add("Content-Type", "application/x-www-form-urlencoded")
+
+        val req = HttpEntity<Nothing?>(null, headers)
+
+        val url = "$tokenUrl?grant_type=authorization_code&client_id=$clientId&code=$code&redirect_uri=$callbackUrl"
+
+        // exchange cognitoJWT with Raken JWT
 
         return client.postForObject(url, req, CognitoJWT::class.java)
     }
